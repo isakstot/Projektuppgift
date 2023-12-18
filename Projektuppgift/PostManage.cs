@@ -8,5 +8,19 @@ namespace Projektuppgift
 {
     internal class PostManage
     {
+        public  void CreatePost()
+        { 
+        
+        }
+
+        public void DeletePost() 
+        {
+        
+        }
+
+        public void SearchPost()
+        {
+
+        }
     }
 }

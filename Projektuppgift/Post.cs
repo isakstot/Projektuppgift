@@ -8,5 +8,16 @@ namespace Projektuppgift
 {
     internal class Post
     {
+        public string Title { get; set; }
+        public DateTime Date { get; set; }
+        public string Body { get; set; }
+
+        public Post(string title, DateTime date, string body) 
+        {
+            Title = title;
+            Date = date;
+            Body = body;
+        }
+        //lägg till ToString funktion
     }
 }
