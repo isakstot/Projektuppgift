@@ -4,6 +4,7 @@
     {
         static void Main(string[] args)
         {
+            #region CreateMenus
             Menu searchMenu = new Menu(
                 new MenuItem("Search by title", () => Console.WriteLine("wip")),
                 new MenuItem("Search by date", () => Console.WriteLine("wip")),
@@ -15,9 +16,9 @@
                 new MenuItem("say balls", () => Console.WriteLine("balls")),
                 new MenuItem("Search", () => searchMenu.Run())
             );
+            #endregion
 
             mainMenu.Run();
         }
-       
     }
 }

@@ -19,7 +19,7 @@ namespace Projektuppgift
         {
             for (int i = 0; i < menuItems.Length; i++) 
             {
-                Console.WriteLine($"{i + 1}. {menuItems[i].Title}");            
+                Console.WriteLine($"{i + 1}. {menuItems[i].Title}");
             }
 
             Console.WriteLine("0. Exit");
@@ -33,12 +33,12 @@ namespace Projektuppgift
 
                 Console.Write("Pick an option: ");
 
-                try 
+                try
                 {
                     int input = int.Parse(Console.ReadLine());
                     if (input == 0) 
                     {
-                        break;                                      
+                        break;
                     }
                     else if (input <= menuItems.Length && input > 0)
                     {
@@ -49,11 +49,10 @@ namespace Projektuppgift
                         Console.WriteLine("Invalid input, please try again.");
                     }
                 }
-                catch 
+                catch
                 {
                     Console.WriteLine("Invalid input, please try again.");
                 }
-                
             }
         }
     }

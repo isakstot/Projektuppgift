@@ -19,5 +19,9 @@ namespace Projektuppgift
             Body = body;
         }
         //lägg till ToString funktion
+        public override string ToString()
+        {
+            return $"Title: {Title}\nDate: {Date}\nBody: {Body}";
+        }
     }
 }
