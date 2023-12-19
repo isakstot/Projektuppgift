@@ -8,14 +8,16 @@
             PostManage postManager = new PostManage();
             #region CreateMenus
             Menu searchMenu = new Menu(
-                new MenuItem("Search by title", () => Console.WriteLine("wip")),
-                new MenuItem("Search by date", () => Console.WriteLine("wip")),
-                new MenuItem("Search by tags", () => Console.WriteLine("wip"))
+                new MenuItem("Search by title", () => postManager.SearchPost("title")),
+                new MenuItem("Search by date", () => postManager.SearchPost("date")),
+                new MenuItem("Search by tags", () => postManager.SearchPost("tag"))
             );
 
             Menu mainMenu = new Menu(
                 new MenuItem("Create post", () => postManager.CreatePost()),
-                new MenuItem("say balls", () => Console.WriteLine("balls")),
+                new MenuItem("Print all posts", () => postManager.PrintPosts()),
+                new MenuItem("Delete post", () => postManager.DeletePost()),
+                new MenuItem("Say balls", () => Console.WriteLine("balls")),
                 new MenuItem("Search", () => searchMenu.Run())
             );
             #endregion

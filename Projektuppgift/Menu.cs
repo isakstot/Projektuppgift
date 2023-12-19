@@ -17,6 +17,7 @@ namespace Projektuppgift
 
         public void Display()
         {
+            System.Console.Clear();
             for (int i = 0; i < menuItems.Length; i++) 
             {
                 Console.WriteLine($"{i + 1}. {menuItems[i].Title}");
