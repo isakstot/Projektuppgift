@@ -11,9 +11,11 @@ namespace Projektuppgift
         public string Title { get; set; }
         public DateTime Date { get; set; }
         public string Body { get; set; }
+        public Tags Tag { get; set; }
 
-        public Post(string title, DateTime date, string body) 
+        public Post(string title, DateTime date, string body, Tags tag) 
         {
+            Tag = tag;
             Title = title;
             Date = date;
             Body = body;
@@ -21,7 +23,7 @@ namespace Projektuppgift
         
         public override string ToString()
         {
-            return $"Title: {Title}\nDate: {Date}\nBody: {Body}";
+            return $"Title: {Title} \nTag: {Tag}\nDate: {Date.ToString("yyyy-MM-dd")}\nBody: {Body}";
         }
     }
 }

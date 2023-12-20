@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,20 +11,29 @@ namespace Projektuppgift
     {
         private readonly MenuItem[] menuItems;
 
-        public Menu(params MenuItem[] menuItems)
+        private readonly string title;
+
+        public Menu(string title, params MenuItem[] menuItems)
         {
+            this.title = title;
             this.menuItems = menuItems;
         }
 
         public void Display()
         {
-            System.Console.Clear();
+            Console.Clear();
             for (int i = 0; i < menuItems.Length; i++) 
             {
                 Console.WriteLine($"{i + 1}. {menuItems[i].Title}");
             }
-
+            if (title == "Main menu")
+            { 
             Console.WriteLine("0. Exit");
+            }
+            else
+            {
+                Console.WriteLine("0. Back to main menu");
+            }
         }
 
         public void Run() 
