@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Projektuppgift
 {
     internal class PostManage
     {
+
+        const string folderName = "Posts";
+        static string projectPath = Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).FullName).FullName).FullName;
+        string fullPath = projectPath + "\\" + folderName;
         public List<Post> Posts = new List<Post>();
 
         public void WaitForInput()
@@ -17,14 +22,81 @@ namespace Projektuppgift
             Console.ReadKey();
         }
 
+        public void ReadPosts()
+        {
+            var fileCount = (from file in Directory.EnumerateFiles(fullPath, "*.txt", SearchOption.AllDirectories)
+                                                         select file).Count();
+            foreach (string file in Directory.EnumerateFiles(fullPath, "*.txt", SearchOption.AllDirectories))
+            {
+                string[] lines = File.ReadAllLines(file);
+                string title = lines[0];
+                Tags tag = lines[1].ToLower() switch
+                {
+                    "diary" => Tags.Diary,
+                    "note" => Tags.Note,
+                    "quote" => Tags.Quote,
+                    "poem" => Tags.Poem,
+                    _ => Tags.None,
+                };
+                DateTime date = DateTime.Parse(lines[2]);
+                string body = lines[3];
+                Post post = new Post(title, date, body, tag);
+                Posts.Add(post);
+            }
+        }
+
         public void CreatePost()
         {
-            Console.Clear();
-            Console.WriteLine("Title of post:");
-            string title = Console.ReadLine();
+            string title;
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("Title of post:");
+                title = Console.ReadLine();
+                if (title == "")
+                {
+                    Console.WriteLine("Title can't be empty, try again");
+                }
+                else if (title.Length > 64)
+                {
+                    Console.WriteLine("Title can't be longer than 64 characters, try again");
+                }
+                //regex to check for invalid characters
+                else if (!Regex.IsMatch(title, "^[a-zA-Z0-9_-]*$"))
+                {
+                    Console.WriteLine("Title contains invalid characters");
+                }
+                else
+                {
+                    break;
+                }
+                WaitForInput();
+            }
+            
+            foreach (Post postTitle in Posts)
+            {
+                if (title == postTitle.Title)
+                {
+                    Console.WriteLine("Post with that title already exists, try again");
+                    WaitForInput();
+                    CreatePost();
+                }
+            }
             DateTime date = DateTime.Now;
             Console.WriteLine("Body of post:");
-            string body = Console.ReadLine();
+            string body;
+            while (true)
+            {
+                body = Console.ReadLine();
+                if (body == "")
+                {
+                    Console.WriteLine("Body can't be empty, try again");
+                }
+                else
+                {
+                    break;
+                }
+            }
             Console.WriteLine("Tag of post (diary, note, quote, poem) or leave empty for none:");
             Tags tag = Console.ReadLine().ToLower() switch
             {
@@ -36,8 +108,13 @@ namespace Projektuppgift
             };
             Post post = new Post(title, date, body, tag);
             Posts.Add(post);
-            Console.Clear();
             Console.WriteLine("Post \"" + post.Title + "\" successfully created!");
+            //save post to file
+            string fileName = post.Title + ".txt";
+            string filePath = Path.Combine(fullPath, fileName);
+            Console.WriteLine(filePath);
+            string fileContent = $"{post.Title}\n{post.Tag}\n{post.Date}\n{post.Body}";
+            File.WriteAllText(filePath, fileContent);
             WaitForInput();
         }
 
@@ -53,7 +130,6 @@ namespace Projektuppgift
                 Console.WriteLine(post.Title);
             }
             Console.WriteLine("Name of post to delete (leave empty to cancel):");
-            //print all post titles
             
             string postToDelete = Console.ReadLine();
             if (postToDelete == "")
@@ -61,6 +137,7 @@ namespace Projektuppgift
                 return;
             }
 
+            //print all post titles
             foreach (Post post in Posts)
             {
                 if (post.Title == postToDelete)
@@ -72,7 +149,16 @@ namespace Projektuppgift
                     if (confirmation == "y")
                     {
                         Posts.Remove(post);
-                        Console.WriteLine($"Post \"{post.Title}\" successfully deleted!");
+                        File.Delete(fullPath + "\\" + post.Title + ".txt");
+                        if (File.Exists(fullPath + "\\" + post.Title + ".txt"))
+                        {
+                            Console.WriteLine("Failed to delete post");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Post \"{post.Title}\" successfully deleted!");
+
+                        }
                         WaitForInput();
                         break;
                     }
@@ -92,133 +178,118 @@ namespace Projektuppgift
 
         public void SearchPost(string searchMethod)
         {
+            Console.Clear();
             bool postFound = false;
 
-            Console.Clear();
             switch (searchMethod)
             {
                 case "title":
-                    Console.WriteLine("Title to search for:");
-                    string searchQuery = Console.ReadLine().ToLower();
-                    foreach (Post post in Posts)
-                    {
-                        if (post.Title.ToLower().Contains(searchQuery))
-                        {
-                            postFound = true;
-                            Console.WriteLine(post.ToString());
-                        }
-                    }
-                    if (!postFound)
-                    {
-                        Console.WriteLine($"No posts found containing \"{searchQuery}\"");
-                    }
-                    WaitForInput();
+                    SearchByTitle(ref postFound);
                     break;
-                case"date":
-                    //search function for year, month and date
-                    bool monthEmpty = false;
-                    bool dayEmpty = false;
-                    Console.Write("Year to search for: ");
-                    int year = int.Parse(Console.ReadLine());
-
-                    Console.Write("Month: ");
-                    string monthInput = Console.ReadLine();
-                    int month;
-                    if (monthInput == "")
-                    {
-                        monthEmpty = true;
-                        month = 1;
-                    }
-                    else
-                    {
-                        month = int.Parse(monthInput);
-                    }
-                    if (monthEmpty)
-                    {
-                        foreach (Post post in Posts)
-                        {
-                            if (post.Date.Year == year)
-                            {
-                                postFound = true;
-                                Console.WriteLine(post.ToString());
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Console.Write("Day: ");
-                        string dayInput = Console.ReadLine();
-                        int day;
-                        if (dayInput == "")
-                        {
-                            dayEmpty = true;
-                            day = 1;
-                        }
-                        else
-                        {
-                            day = int.Parse(dayInput);
-                        }
-                        
-                        if (dayEmpty)
-                        {
-                            foreach (Post post in Posts)
-                            {
-                                if (post.Date.Year == year && post.Date.Month == month)
-                                {
-                                    postFound = true;
-                                    Console.WriteLine(post.ToString());
-                                }
-                            }
-                        }
-                        else
-                        {
-                            foreach (Post post in Posts)
-                            {
-                                if (post.Date.Year == year && post.Date.Month == month && post.Date.Day == day)
-                                {
-                                    postFound = true;
-                                    Console.WriteLine(post.ToString());
-                                }
-                            }
-                        }
-                    }
-
-                    if (!postFound)
-                    {
-                        Console.WriteLine($"No posts found from that date.");
-                    }
-                    WaitForInput();
+                case "date":
+                    SearchByDate(ref postFound);
                     break;
                 case "tag":
-                    string tagInput = Console.ReadLine().ToLower();
-                    Tags tagQuery = tagInput switch
-                    {
-                        "diary" => Tags.Diary,
-                        "note" => Tags.Note,
-                        "quote" => Tags.Quote,
-                        "poem" => Tags.Poem,
-                        _ => Tags.None,
-                    };
-
-                    foreach (Post post in Posts)
-                    {
-                        if (post.Tag == tagQuery)
-                        {
-                            postFound = true;
-                            Console.WriteLine(post.ToString());
-                        }
-                    }
-                    if(!postFound)
-                    {
-                        Console.WriteLine($"No posts found with tag \"{tagInput}\"");
-                    }
-                    WaitForInput();
+                    SearchByTag(ref postFound);
                     break;
             }
+
+            if (!postFound)
+            {
+                Console.WriteLine("No matching posts found.");
+            }
+
+            WaitForInput();
+        }
+
+        private void SearchByTitle(ref bool postFound)
+        {
+            Console.Write("Title to search for:");
+            string searchQuery = Console.ReadLine().ToLower();
+
+            foreach (Post post in Posts)
+            {
+                if (post.Title.ToLower().Contains(searchQuery))
+                {
+                    postFound = true;
+                    Console.WriteLine(post.ToString());
+                }
+            }
+        }
+
+        private void SearchByDate(ref bool postFound)
+        {
+            Console.Write("Year to search for: ");
+            if (!int.TryParse(Console.ReadLine(), out int year))
+            {
+                Console.WriteLine("Invalid input. Please enter a valid year.");
+                return;
+            }
+
+            int? month = GetNumericInput("Month (press Enter to skip):");
+            int? day = GetNumericInput("Day (press Enter to skip):");
+
+            foreach (Post post in Posts)
+            {
+                if ((!month.HasValue || post.Date.Month == month) && (!day.HasValue || post.Date.Day == day) && post.Date.Year == year)
+                {
+                    postFound = true;
+                    Console.WriteLine(post.ToString());
+                }
+            }
+        }
+
+        private void SearchByTag(ref bool postFound)
+        {
+            Console.Write("Available tags: ");
+            foreach (Tags tag in Enum.GetValues(typeof(Tags)))
+            {
+                Console.Write(tag.ToString() + ", ");
+            }
+            Console.Write("\nTag to search for:");
+            string tagInput = Console.ReadLine();
+
+            Tags tagQuery = tagInput.ToLower() switch
+            {
+                "diary" => Tags.Diary,
+                "note" => Tags.Note,
+                "quote" => Tags.Quote,
+                "poem" => Tags.Poem,
+                _ => Tags.None,
+            };
+
+            foreach (Post post in Posts)
+            {
+                if (post.Tag == tagQuery)
+                {
+                    postFound = true;
+                    Console.WriteLine(post.ToString());
+                }
+            }
+        }
+
+        private int? GetNumericInput(string prompt)
+        {
+            Console.Write(prompt);
+            string input = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(input))
+            {
+                return null;
+            }
+
+            if (!int.TryParse(input, out int result))
+            {
+                Console.WriteLine("Invalid input. Please enter a valid number.");
+                return null;
+            }
+
+            return result;
         }
 
         public void PrintPosts()
         {
+            Posts.Sort((x, y) => DateTime.Compare(x.Date, y.Date));
             Console.Clear();
             foreach (Post post in Posts)
             {

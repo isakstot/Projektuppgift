@@ -22,14 +22,7 @@
             );
             #endregion
 
-            Post post1 = new Post ("Post1", new DateTime(2021, 1, 1), "Body1", Tags.Diary);
-            Post post2 = new Post ("Post2", new DateTime(2021, 12, 2), "Body2", Tags.Note);
-            Post post3 = new Post ("Post3", new DateTime(2022, 3, 3), "Body3", Tags.Quote);
-            Post post4 = new Post ("Post4", new DateTime(2022, 3, 4), "Body4", Tags.Poem);
-            postManager.Posts.Add(post1);
-            postManager.Posts.Add(post2);
-            postManager.Posts.Add(post3);
-            postManager.Posts.Add(post4);
+            postManager.ReadPosts();
 
             mainMenu.Run();
 
