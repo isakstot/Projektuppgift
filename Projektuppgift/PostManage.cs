@@ -10,17 +10,11 @@ namespace Projektuppgift
 {
     internal class PostManage
     {
-
+        Utility utility = new Utility();
         const string folderName = "Posts";
         static string projectPath = Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).FullName).FullName).FullName;
         string fullPath = projectPath + "\\" + folderName;
         public List<Post> Posts = new List<Post>();
-
-        public void WaitForInput()
-        {
-            Console.WriteLine("Press any key to continue:");
-            Console.ReadKey();
-        }
 
         public void ReadPosts()
         {
@@ -51,13 +45,8 @@ namespace Projektuppgift
             while (true)
             {
                 Console.Clear();
-                Console.WriteLine("Title of post:");
-                title = Console.ReadLine();
-                if (title == "")
-                {
-                    Console.WriteLine("Title can't be empty, try again");
-                }
-                else if (title.Length > 64)
+                title = utility.GetStringInput("Title of post:");
+                if (title.Length > 64)
                 {
                     Console.WriteLine("Title can't be longer than 64 characters, try again");
                 }
@@ -70,7 +59,7 @@ namespace Projektuppgift
                 {
                     break;
                 }
-                WaitForInput();
+                utility.WaitForInput();
             }
             
             foreach (Post postTitle in Posts)
@@ -78,25 +67,12 @@ namespace Projektuppgift
                 if (title == postTitle.Title)
                 {
                     Console.WriteLine("Post with that title already exists, try again");
-                    WaitForInput();
+                    utility.WaitForInput();
                     CreatePost();
                 }
             }
             DateTime date = DateTime.Now;
-            Console.WriteLine("Body of post:");
-            string body;
-            while (true)
-            {
-                body = Console.ReadLine();
-                if (body == "")
-                {
-                    Console.WriteLine("Body can't be empty, try again");
-                }
-                else
-                {
-                    break;
-                }
-            }
+            string body = utility.GetStringInput("Body of post:");
             Console.WriteLine("Tag of post (diary, note, quote, poem) or leave empty for none:");
             Tags tag = Console.ReadLine().ToLower() switch
             {
@@ -112,10 +88,9 @@ namespace Projektuppgift
             //save post to file
             string fileName = post.Title + ".txt";
             string filePath = Path.Combine(fullPath, fileName);
-            Console.WriteLine(filePath);
             string fileContent = $"{post.Title}\n{post.Tag}\n{post.Date}\n{post.Body}";
             File.WriteAllText(filePath, fileContent);
-            WaitForInput();
+            utility.WaitForInput();
         }
 
         public void DeletePost()
@@ -129,6 +104,7 @@ namespace Projektuppgift
             {
                 Console.WriteLine(post.Title);
             }
+
             Console.WriteLine("Name of post to delete (leave empty to cancel):");
             
             string postToDelete = Console.ReadLine();
@@ -146,7 +122,7 @@ namespace Projektuppgift
                     //take confirmation
                     Console.WriteLine($"Are you sure you want to delete \"{post.Title}\"? (y/n)");
                     string confirmation = Console.ReadLine();
-                    if (confirmation == "y")
+                    if (confirmation.ToLower() == "y")
                     {
                         Posts.Remove(post);
                         File.Delete(fullPath + "\\" + post.Title + ".txt");
@@ -159,11 +135,13 @@ namespace Projektuppgift
                             Console.WriteLine($"Post \"{post.Title}\" successfully deleted!");
 
                         }
-                        WaitForInput();
+                        utility.WaitForInput();
                         break;
                     }
                     else
                     {
+                        Console.WriteLine("Post deletion cancelled!");
+                        utility.WaitForInput();
                         break;
                     }
                 }
@@ -171,7 +149,7 @@ namespace Projektuppgift
             if (!postFound)
             {
                 Console.WriteLine($"Post \"{postToDelete}\" not found, try again");
-                WaitForInput();
+                utility.WaitForInput();
                 DeletePost();
             }
         }
@@ -199,7 +177,7 @@ namespace Projektuppgift
                 Console.WriteLine("No matching posts found.");
             }
 
-            WaitForInput();
+            utility.WaitForInput();
         }
 
         private void SearchByTitle(ref bool postFound)
@@ -212,6 +190,7 @@ namespace Projektuppgift
                 if (post.Title.ToLower().Contains(searchQuery))
                 {
                     postFound = true;
+                    Console.WriteLine();
                     Console.WriteLine(post.ToString());
                 }
             }
@@ -226,8 +205,8 @@ namespace Projektuppgift
                 return;
             }
 
-            int? month = GetNumericInput("Month (press Enter to skip):");
-            int? day = GetNumericInput("Day (press Enter to skip):");
+            int? month = utility.GetNumericInput("Month (press Enter to skip):");
+            int? day = utility.GetNumericInput("Day (press Enter to skip):");
 
             foreach (Post post in Posts)
             {
@@ -268,35 +247,20 @@ namespace Projektuppgift
             }
         }
 
-        private int? GetNumericInput(string prompt)
-        {
-            Console.Write(prompt);
-            string input = Console.ReadLine();
-
-            if (string.IsNullOrEmpty(input))
-            {
-                return null;
-            }
-
-            if (!int.TryParse(input, out int result))
-            {
-                Console.WriteLine("Invalid input. Please enter a valid number.");
-                return null;
-            }
-
-            return result;
-        }
-
         public void PrintPosts()
         {
             Posts.Sort((x, y) => DateTime.Compare(x.Date, y.Date));
             Console.Clear();
+            if (Posts.Count == 0)
+            {
+                Console.WriteLine("No posts available.");
+            }
             foreach (Post post in Posts)
             {
                 Console.WriteLine(post.ToString());
                 Console.WriteLine();
             }
-            WaitForInput();
+            utility.WaitForInput();
         }
     }
 }

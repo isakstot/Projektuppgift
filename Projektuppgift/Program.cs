@@ -17,7 +17,6 @@
                 new MenuItem("Create post", () => postManager.CreatePost()),
                 new MenuItem("Print all posts", () => postManager.PrintPosts()),
                 new MenuItem("Delete post", () => postManager.DeletePost()),
-                //new MenuItem("Say balls", () => Console.WriteLine("balls")),
                 new MenuItem("Search", () => searchMenu.Run())
             );
             #endregion
