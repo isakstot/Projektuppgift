@@ -45,7 +45,7 @@ namespace Projektuppgift
             while (true)
             {
                 Console.Clear();
-                title = utility.GetStringInput("Title of post:");
+                title = utility.GetStringInput("Title of post: ");
                 if (title.Length > 64)
                 {
                     Console.WriteLine("Title can't be longer than 64 characters, try again");
@@ -72,8 +72,8 @@ namespace Projektuppgift
                 }
             }
             DateTime date = DateTime.Now;
-            string body = utility.GetStringInput("Body of post:");
-            Console.WriteLine("Tag of post (diary, note, quote, poem) or leave empty for none:");
+            string body = utility.GetStringInput("Body of post: ");
+            Console.Write("Tag of post (Diary, Note, Quote, Poem or None): ");
             Tags tag = Console.ReadLine().ToLower() switch
             {
                 "diary" => Tags.Diary,
@@ -98,14 +98,14 @@ namespace Projektuppgift
             bool postFound = false;
 
             Console.Clear();
-
+            //print all post titles
             Console.WriteLine("Posts available:");
             foreach (Post post in Posts)
             {
                 Console.WriteLine(post.Title);
             }
 
-            Console.WriteLine("Name of post to delete (leave empty to cancel):");
+            Console.Write("Name of post to delete (leave empty to cancel): ");
             
             string postToDelete = Console.ReadLine();
             if (postToDelete == "")
@@ -113,7 +113,6 @@ namespace Projektuppgift
                 return;
             }
 
-            //print all post titles
             foreach (Post post in Posts)
             {
                 if (post.Title == postToDelete)
@@ -182,7 +181,8 @@ namespace Projektuppgift
 
         private void SearchByTitle(ref bool postFound)
         {
-            Console.Write("Title to search for:");
+            //doesn't use utility.GetStringInput because it should be possible to search for empty string
+            Console.Write("Title to search for: ");
             string searchQuery = Console.ReadLine().ToLower();
 
             foreach (Post post in Posts)
@@ -205,8 +205,8 @@ namespace Projektuppgift
                 return;
             }
 
-            int? month = utility.GetNumericInput("Month (press Enter to skip):");
-            int? day = utility.GetNumericInput("Day (press Enter to skip):");
+            int? month = utility.GetNumericInput("Month (press Enter to skip): ");
+            int? day = utility.GetNumericInput("Day (press Enter to skip): ");
 
             foreach (Post post in Posts)
             {

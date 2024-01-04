@@ -28,7 +28,7 @@ namespace Projektuppgift
             }
             if (title == "Main menu")
             { 
-            Console.WriteLine("0. Exit");
+                Console.WriteLine("0. Exit");
             }
             else
             {
@@ -55,7 +55,7 @@ namespace Projektuppgift
                     {
                         menuItems[input - 1].Action.Invoke();
                     }
-                    else 
+                    else
                     {
                         Console.WriteLine("Invalid input, please try again.");
                     }
